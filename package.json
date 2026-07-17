@@ -1,6 +1,5 @@
 {
   "name": "copyreply",
-  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,15 +8,15 @@
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
-    "next": "15.2.4",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "next": "15.5.7",
+    "react": "19.1.2",
+    "react-dom": "19.1.2"
   },
- "dependencies": {
-  "lucide-react": "^0.468.0",
-  "next": "15.2.6",
-  "react": "19.0.1",
-  "react-dom": "19.0.1"
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
   },
   "engines": {
     "node": "22.x"
