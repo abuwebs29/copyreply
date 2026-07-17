@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound(){return <section className="section"><div className="container narrow"><span className="eyebrow">404</span><h1>We could not find that reply.</h1><p className="lead">Search the library or browse a category to find wording for your situation.</p><div className="actions"><Link className="button" href="/">Go home</Link><Link className="button secondary" href="/search">Search replies</Link></div></div></section>}

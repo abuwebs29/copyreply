@@ -1,0 +1,1 @@
+export default function Page(){return <div className="container contentpage"><h1>Terms of Use</h1><p>CopyReply provides general communication examples for informational purposes. Users should review and personalize any reply before sending it.</p><p>We do not guarantee that a template is suitable for every legal, employment, financial, or personal situation.</p></div>}

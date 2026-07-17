@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function Footer(){return <footer className="footer"><div className="container footerinner"><div>© {new Date().getFullYear()} CopyReply. The right words, ready to copy.</div><div className="footerlinks"><Link href="/about">About</Link><Link href="/contact">Contact</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></div></div></footer>}

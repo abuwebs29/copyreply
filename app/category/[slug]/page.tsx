@@ -1,0 +1,5 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { categories,getCategory,replies } from "@/lib/data";
+export function generateStaticParams(){return categories.map(c=>({slug:c.slug}))}
+export default async function CategoryPage({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const c=getCategory(slug);if(!c)notFound();const items=replies.filter(r=>r.categorySlug===slug);return <><section className="pagehero"><div className="container"><div className="breadcrumb"><Link href="/">Home</Link> / {c.name}</div><h1>{c.name} replies</h1><p>{c.description}</p></div></section><section className="section"><div className="container">{items.length?<div className="replygrid">{items.map(r=><Link className="replycard" href={`/reply/${r.slug}`} key={r.slug}><span className="pill">{r.category}</span><h3>{r.title}</h3><p>{r.description}</p><span className="arrow">View replies →</span></Link>)}</div>:<div className="empty">More replies are being prepared for this category.</div>}</div></section></>}

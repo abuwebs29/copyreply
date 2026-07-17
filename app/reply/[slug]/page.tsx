@@ -1,0 +1,8 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import CopyButton from "@/components/CopyButton";
+import { getReply,replies } from "@/lib/data";
+export function generateStaticParams(){return replies.map(r=>({slug:r.slug}))}
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{const {slug}=await params;const r=getReply(slug);if(!r)return {};return {title:r.title,description:r.description,alternates:{canonical:`/reply/${r.slug}`}}}
+export default async function ReplyPage({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const r=getReply(slug);if(!r)notFound();const related=replies.filter(x=>x.categorySlug===r.categorySlug&&x.slug!==r.slug).slice(0,3);return <><section className="pagehero"><div className="container"><div className="breadcrumb"><Link href="/">Home</Link> / <Link href={`/category/${r.categorySlug}`}>{r.category}</Link> / {r.title}</div><span className="pill">{r.category}</span><h1>{r.title}</h1><p>{r.description} Choose the tone that fits your situation, then copy and personalize it.</p></div></section><section className="container replyvariants">{r.variants.map(v=><article className="variant" key={v.label}><div className="varianttop"><h2>{v.label} reply</h2><CopyButton text={v.text}/></div><blockquote>{v.text}</blockquote></article>)}{related.length>0&&<div><div className="sectionhead"><div><h2>Related replies</h2></div></div><div className="replygrid">{related.map(x=><Link className="replycard" href={`/reply/${x.slug}`} key={x.slug}><span className="pill">{x.category}</span><h3>{x.title}</h3><p>{x.description}</p></Link>)}</div></div>}</section></>}
