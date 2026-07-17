@@ -14,5 +14,5 @@
   "engines": {
     "node": "22.x"
   },
-  "packageManager": "pnpm@11.6.0"
+  "packageManager": "bun@1.2.21"
 }
