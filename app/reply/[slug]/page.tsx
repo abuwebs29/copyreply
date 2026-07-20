@@ -70,7 +70,7 @@ export default async function ReplyPage({ params }: { params: Promise<{ slug: st
       </section>
 
       <main className="container replypage">
-        <ReplyLibrary variants={r.variants} />
+        <ReplyLibrary variants={r.variants} slug={r.slug} title={r.title} />
 
         <section className="guidecard">
           <h2>How to use these replies</h2>

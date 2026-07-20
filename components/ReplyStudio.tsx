@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Copy, RotateCcw, Sparkles } from "lucide-react";
 import type { ReplyItem } from "@/lib/data";
+import { recordReplyCopy, trackEvent } from "@/lib/clientAnalytics";
 
 type Length = "one-line" | "short" | "medium" | "detailed";
 
@@ -89,6 +90,8 @@ export default function ReplyStudio({ replies }: { replies: ReplyItem[] }) {
 
   async function copyOutput() {
     await navigator.clipboard.writeText(output);
+    recordReplyCopy(selectedReply.slug, selectedReply.title, `Studio: ${state.tone}`);
+    trackEvent("studio_reply_copied", { reply_slug: selectedReply.slug, tone: state.tone, length: state.length });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   }
