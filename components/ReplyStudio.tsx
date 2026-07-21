@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Clock3, Copy, Heart, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Clock3, Copy, Download, FileText, Heart, Mail, Printer, RotateCcw, Share2, Sparkles, Trash2 } from "lucide-react";
 import type { ReplyItem } from "@/lib/data";
 import { recordReplyCopy, trackEvent } from "@/lib/clientAnalytics";
 
@@ -37,10 +37,36 @@ type HistoryItem = {
 const DRAFT_KEY = "copyreply-studio-draft-v2";
 const HISTORY_KEY = "copyreply-studio-history-v2";
 const MAX_HISTORY = 10;
+const SHARE_PARAM = "draft";
 
 function safeParse<T>(value: string | null, fallback: T): T {
   if (!value) return fallback;
   try { return JSON.parse(value) as T; } catch { return fallback; }
+}
+
+function encodeShareState(state: FormState) {
+  const json = JSON.stringify(state);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+
+function decodeShareState(value: string | null): FormState | null {
+  if (!value) return null;
+  try { return JSON.parse(decodeURIComponent(escape(atob(value)))) as FormState; } catch { return null; }
+}
+
+function safeFilename(title: string) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "copyreply-message";
+}
+
+function downloadBlob(content: BlobPart, filename: string, type: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 function firstSentence(text: string) {
@@ -143,8 +169,13 @@ export default function ReplyStudio({ replies }: { replies: ReplyItem[] }) {
   const [draftReady, setDraftReady] = useState(false);
 
   useEffect(() => {
-    const draft = safeParse<FormState | null>(localStorage.getItem(DRAFT_KEY), null);
-    if (draft && replies.some((reply) => reply.slug === draft.replySlug)) setState({ ...makeDefault(first), ...draft });
+    const params = new URLSearchParams(window.location.search);
+    const shared = decodeShareState(params.get(SHARE_PARAM));
+    const draft = shared || safeParse<FormState | null>(localStorage.getItem(DRAFT_KEY), null);
+    if (draft && replies.some((reply) => reply.slug === draft.replySlug)) {
+      setState({ ...makeDefault(first), ...draft });
+      if (shared) trackEvent("studio_shared_draft_opened", { reply_slug: draft.replySlug });
+    }
     setHistory(safeParse<HistoryItem[]>(localStorage.getItem(HISTORY_KEY), []));
     setDraftReady(true);
   }, [first, replies]);
@@ -207,6 +238,53 @@ export default function ReplyStudio({ replies }: { replies: ReplyItem[] }) {
   function removeHistory(id: string) { persistHistory(history.filter((item) => item.id !== id)); }
   function clearHistory() { persistHistory([]); }
 
+  function exportText() {
+    downloadBlob(output, `${safeFilename(selectedReply.title)}.txt`, "text/plain;charset=utf-8");
+    trackEvent("studio_exported", { format: "txt", reply_slug: selectedReply.slug });
+  }
+
+  function exportWord() {
+    const escaped = output.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+    const documentHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${selectedReply.title}</title></head><body><h1>${selectedReply.title}</h1><p>${escaped}</p><hr><p><small>Created with CopyReply.com</small></p></body></html>`;
+    downloadBlob(documentHtml, `${safeFilename(selectedReply.title)}.doc`, "application/msword");
+    trackEvent("studio_exported", { format: "word", reply_slug: selectedReply.slug });
+  }
+
+  function printReply() {
+    const popup = window.open("", "copyreply-print", "width=760,height=720");
+    if (!popup) return;
+    const escaped = output.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+    popup.document.write(`<!doctype html><html><head><title>${selectedReply.title}</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:48px auto;padding:0 24px;color:#17223b;line-height:1.7}h1{font-size:26px}article{white-space:normal;border:1px solid #ddd;border-radius:12px;padding:24px}footer{margin-top:28px;color:#777;font-size:12px}@media print{body{margin:0}button{display:none}}</style></head><body><h1>${selectedReply.title}</h1><article>${escaped}</article><footer>Created with CopyReply.com</footer><script>window.onload=()=>{window.print()}<\/script></body></html>`);
+    popup.document.close();
+    trackEvent("studio_exported", { format: "print_pdf", reply_slug: selectedReply.slug });
+  }
+
+  function emailReply() {
+    const subject = encodeURIComponent(selectedReply.title);
+    const body = encodeURIComponent(output);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    trackEvent("studio_shared", { method: "email", reply_slug: selectedReply.slug });
+  }
+
+  async function shareReply() {
+    const url = new URL(window.location.href);
+    url.searchParams.set(SHARE_PARAM, encodeShareState(state));
+    const shareData = { title: selectedReply.title, text: output, url: url.toString() };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        trackEvent("studio_shared", { method: "native", reply_slug: selectedReply.slug });
+      } else {
+        await navigator.clipboard.writeText(url.toString());
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1800);
+        trackEvent("studio_shared", { method: "link_copy", reply_slug: selectedReply.slug });
+      }
+    } catch (error) {
+      if ((error as Error).name !== "AbortError") console.error(error);
+    }
+  }
+
   function reset() {
     const next = makeDefault(first);
     setState(next);
@@ -265,7 +343,17 @@ export default function ReplyStudio({ replies }: { replies: ReplyItem[] }) {
           </div>
           <p className="studio-suggestion">{suggestion}</p>
           <div className="studio-preview-actions"><button className="button studio-copy" type="button" onClick={copyOutput}><Copy size={18}/>{copied ? "Copied!" : "Copy customized reply"}</button><button className="actionbtn studio-save" type="button" onClick={() => saveSnapshot(true)}><Heart size={17}/> Save version</button></div>
-          <p className="studio-note">CopyReply customizes curated templates in your browser. Review names, dates, and facts before sending.</p>
+          <div className="studio-export-panel" aria-label="Export and sharing options">
+            <div className="studio-export-heading"><span><Download size={17}/><b>Export & share</b></span><small>No account required</small></div>
+            <div className="studio-export-grid">
+              <button type="button" onClick={exportText}><FileText size={17}/><span>Text file<small>.txt download</small></span></button>
+              <button type="button" onClick={exportWord}><Download size={17}/><span>Word file<small>.doc download</small></span></button>
+              <button type="button" onClick={printReply}><Printer size={17}/><span>Print / PDF<small>Use Save as PDF</small></span></button>
+              <button type="button" onClick={emailReply}><Mail size={17}/><span>Email<small>Open mail app</small></span></button>
+              <button type="button" onClick={shareReply}><Share2 size={17}/><span>Share link<small>Editable Studio draft</small></span></button>
+            </div>
+          </div>
+          <p className="studio-note">CopyReply customizes curated templates in your browser. Review names, dates, and facts before sending. Shared links contain the selected Studio settings in the URL.</p>
         </section>
       </div>
 

@@ -8,7 +8,10 @@ export type CopyReplyEventName =
   | "studio_reply_copied"
   | "studio_draft_saved"
   | "studio_history_loaded"
-  | "studio_reset";
+  | "studio_reset"
+  | "studio_exported"
+  | "studio_shared"
+  | "studio_shared_draft_opened";
 
 const COUNTS_KEY = "copyreply-copy-counts";
 const RECENT_KEY = "copyreply-recently-copied";
