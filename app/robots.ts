@@ -1,2 +1,16 @@
 import type { MetadataRoute } from "next";
-export default function robots():MetadataRoute.Robots{return {rules:{userAgent:"*",allow:"/"},sitemap:"https://copyreply.com/sitemap.xml"}}
+import { site } from "@/lib/site";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/saved"],
+      },
+    ],
+    sitemap: `${site.url}/sitemap.xml`,
+    host: site.url,
+  };
+}

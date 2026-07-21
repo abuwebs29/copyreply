@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ReplyStudio from "@/components/ReplyStudio";
+import JsonLd from "@/components/JsonLd";
+import { site } from "@/lib/site";
 import { replies } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -10,8 +12,23 @@ export const metadata: Metadata = {
 };
 
 export default function StudioPage() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${site.url}/studio#application`,
+    name: "CopyReply Reply Studio",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Any",
+    url: `${site.url}/studio`,
+    description: "A browser-based tool for customizing ready-to-send reply templates.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    publisher: { "@id": `${site.url}/#organization` },
+    isAccessibleForFree: true,
+  };
+
   return (
     <>
+      <JsonLd data={schema} />
       <section className="pagehero studio-hero">
         <div className="container">
           <div className="breadcrumb"><Link href="/">Home</Link> / Reply Studio</div>

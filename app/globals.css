@@ -16,3 +16,33 @@
 
 /* Sprint 6.3B — Export & Sharing */
 .studio-export-panel{margin-top:16px;border:1px solid #e2e7f0;background:#fbfcff;border-radius:17px;padding:14px}.studio-export-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}.studio-export-heading>span{display:flex;align-items:center;gap:8px;color:#34415e}.studio-export-heading small{color:var(--muted);font-size:11px}.studio-export-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.studio-export-grid button{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #e0e6f0;background:#fff;border-radius:12px;padding:11px;color:var(--primary);cursor:pointer}.studio-export-grid button:last-child{grid-column:1/-1}.studio-export-grid button:hover{border-color:#aebcf4;background:#f4f6ff}.studio-export-grid button span{display:grid;gap:2px;color:#34415e;font-weight:800;font-size:13px}.studio-export-grid button small{font-weight:500;color:var(--muted);font-size:10px}@media(max-width:520px){.studio-export-grid{grid-template-columns:1fr}.studio-export-grid button:last-child{grid-column:auto}.studio-export-heading{align-items:flex-start;flex-direction:column}}
+
+/* Sprint 7.1 performance safeguards */
+.section,
+.category-page > section,
+.article-page > section,
+.replypage > section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 640px;
+}
+
+.hero,
+.pagehero {
+  content-visibility: visible;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

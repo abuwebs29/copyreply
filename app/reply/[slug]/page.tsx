@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReplyLibrary from "@/components/ReplyLibrary";
 import ReplyActions from "@/components/ReplyActions";
+import JsonLd from "@/components/JsonLd";
+import { site } from "@/lib/site";
 import { getReply, replies } from "@/lib/data";
 
 export function generateStaticParams() {
@@ -17,7 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${r.title} – Copy-and-Paste Examples`,
     description: `${r.description} Browse ready-to-copy examples, tone options, personalization tips, and related replies.`,
     alternates: { canonical: `/reply/${r.slug}` },
-    openGraph: { title: r.title, description: r.description, type: "article", url: `/reply/${r.slug}` },
+    openGraph: { title: r.title, description: r.description, type: "article", url: `/reply/${r.slug}`, siteName: site.name },
+    twitter: { card: "summary_large_image", title: r.title, description: r.description },
   };
 }
 
@@ -39,11 +42,22 @@ export default async function ReplyPage({ params }: { params: Promise<{ slug: st
     "@graph": [
       {
         "@type": "BreadcrumbList",
+        "@id": `${site.url}/reply/${r.slug}#breadcrumb`,
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: "https://copyreply.com" },
-          { "@type": "ListItem", position: 2, name: r.category, item: `https://copyreply.com/category/${r.categorySlug}` },
-          { "@type": "ListItem", position: 3, name: r.title, item: `https://copyreply.com/reply/${r.slug}` },
+          { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+          { "@type": "ListItem", position: 2, name: r.category, item: `${site.url}/category/${r.categorySlug}` },
+          { "@type": "ListItem", position: 3, name: r.title, item: `${site.url}/reply/${r.slug}` },
         ],
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${site.url}/reply/${r.slug}#webpage`,
+        url: `${site.url}/reply/${r.slug}`,
+        name: r.title,
+        description: r.description,
+        breadcrumb: { "@id": `${site.url}/reply/${r.slug}#breadcrumb` },
+        isPartOf: { "@id": `${site.url}/#website` },
+        inLanguage: "en-US",
       },
       {
         "@type": "FAQPage",
@@ -58,7 +72,7 @@ export default async function ReplyPage({ params }: { params: Promise<{ slug: st
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <JsonLd data={schema} />
       <section className="pagehero">
         <div className="container">
           <div className="breadcrumb"><Link href="/">Home</Link> / <Link href={`/category/${r.categorySlug}`}>{r.category}</Link> / {r.title}</div>
