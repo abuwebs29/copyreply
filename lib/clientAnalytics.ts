@@ -4,6 +4,7 @@ export type CopyReplyEventName =
   | "reply_unsaved"
   | "reply_shared"
   | "search_submitted"
+  | "search_result_clicked"
   | "studio_reply_copied";
 
 const COUNTS_KEY = "copyreply-copy-counts";
