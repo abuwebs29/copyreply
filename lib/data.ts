@@ -1,7 +1,9 @@
 export type ReplyVariant = { label: string; text: string };
 export type ReplyItem = { slug: string; title: string; description: string; category: string; categorySlug: string; keywords: string[]; variants: ReplyVariant[]; };
 
-export const categories = [
+import { scaleCategories, scaleReplies } from "./scaleData";
+
+export const baseCategories = [
   {
     "slug": "work",
     "name": "Work",
@@ -64,7 +66,9 @@ export const categories = [
   }
 ] as const;
 
-export const replies: ReplyItem[] = [
+export const categories = [...baseCategories, ...scaleCategories] as const;
+
+export const baseReplies: ReplyItem[] = [
   {
     slug: "reply-to-recruiter-after-interview", title: "Reply to a Recruiter After an Interview", description: "Professional follow-up replies that show appreciation and genuine interest.",
     category: "Work", categorySlug: "work", keywords: ["recruiter", "interview", "job", "follow up"],
@@ -1144,7 +1148,9 @@ export const replies: ReplyItem[] = [
       { label: "Clarify", text: "Please confirm exactly which document is missing, the required format, and the submission deadline." },
       { label: "Follow Up", text: "I submitted the requested documents on [date]. Please confirm the claim status and expected review timeline." },
     ]
-  },];
+  }];
+
+export const replies: ReplyItem[] = [...baseReplies, ...scaleReplies];
 
 export function getReply(slug: string) { return replies.find((item) => item.slug === slug); }
 export function getCategory(slug: string) { return categories.find((item) => item.slug === slug); }
