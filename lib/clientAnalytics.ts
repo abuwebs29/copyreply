@@ -5,7 +5,10 @@ export type CopyReplyEventName =
   | "reply_shared"
   | "search_submitted"
   | "search_result_clicked"
-  | "studio_reply_copied";
+  | "studio_reply_copied"
+  | "studio_draft_saved"
+  | "studio_history_loaded"
+  | "studio_reset";
 
 const COUNTS_KEY = "copyreply-copy-counts";
 const RECENT_KEY = "copyreply-recently-copied";
