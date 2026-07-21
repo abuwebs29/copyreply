@@ -17,6 +17,15 @@ const COUNTS_KEY = "copyreply-copy-counts";
 const RECENT_KEY = "copyreply-recently-copied";
 const SAVED_KEY = "copyreply-saved";
 const MAX_RECENT = 12;
+const EVENT_LOG_KEY = "copyreply-analytics-events-v1";
+const MAX_EVENTS = 500;
+
+export type StoredAnalyticsEvent = {
+  id: string;
+  name: CopyReplyEventName;
+  params: Record<string, string | number | boolean | undefined>;
+  timestamp: number;
+};
 
 function safeParse<T>(value: string | null, fallback: T): T {
   if (!value) return fallback;
@@ -31,6 +40,9 @@ export function trackEvent(name: CopyReplyEventName, params: Record<string, stri
   if (typeof window === "undefined") return;
   const gtag = (window as typeof window & { gtag?: (...args: unknown[]) => void }).gtag;
   gtag?.("event", name, params);
+  const events = safeParse<StoredAnalyticsEvent[]>(localStorage.getItem(EVENT_LOG_KEY), []);
+  const next: StoredAnalyticsEvent = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, params, timestamp: Date.now() };
+  localStorage.setItem(EVENT_LOG_KEY, JSON.stringify([next, ...events].slice(0, MAX_EVENTS)));
 }
 
 export function getSavedSlugs(): string[] {
@@ -73,4 +85,14 @@ export function getRecentlyCopied() {
     localStorage.getItem(RECENT_KEY),
     []
   );
+}
+
+export function getAnalyticsEvents(): StoredAnalyticsEvent[] {
+  if (typeof window === "undefined") return [];
+  return safeParse<StoredAnalyticsEvent[]>(localStorage.getItem(EVENT_LOG_KEY), []);
+}
+
+export function clearAnalyticsEvents() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(EVENT_LOG_KEY);
 }
