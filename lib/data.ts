@@ -2,6 +2,7 @@ export type ReplyVariant = { label: string; text: string };
 export type ReplyItem = { slug: string; title: string; description: string; category: string; categorySlug: string; keywords: string[]; variants: ReplyVariant[]; };
 
 import { scaleCategories, scaleReplies } from "./scaleData";
+import { authorityCategories, authorityReplies } from "./authorityData";
 
 export const baseCategories = [
   {
@@ -66,7 +67,7 @@ export const baseCategories = [
   }
 ] as const;
 
-export const categories = [...baseCategories, ...scaleCategories] as const;
+export const categories = [...baseCategories, ...scaleCategories, ...authorityCategories] as const;
 
 export const baseReplies: ReplyItem[] = [
   {
@@ -1150,7 +1151,7 @@ export const baseReplies: ReplyItem[] = [
     ]
   }];
 
-export const replies: ReplyItem[] = [...baseReplies, ...scaleReplies];
+export const replies: ReplyItem[] = [...baseReplies, ...scaleReplies, ...authorityReplies];
 
 export function getReply(slug: string) { return replies.find((item) => item.slug === slug); }
 export function getCategory(slug: string) { return categories.find((item) => item.slug === slug); }
