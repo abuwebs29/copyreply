@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import JsonLd from "@/components/JsonLd";
+import ArabicCopyButton from "@/components/ar/ArabicCopyButton";
+import { arabicReplies } from "@/lib/arabicData";
+import { site } from "@/lib/site";
+export function generateStaticParams(){return arabicReplies.map(r=>({slug:r.slug}))}
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{const {slug}=await params;const r=arabicReplies.find(x=>x.slug===slug);if(!r)return{};return{title:r.title,description:r.description,alternates:{canonical:`${site.url}/ar/reply/${r.slug}`,languages:{ar:`${site.url}/ar/reply/${r.slug}`}},openGraph:{title:r.title,description:r.description,locale:"ar_AE",type:"article"}}}
+export default async function Page({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const r=arabicReplies.find(x=>x.slug===slug);if(!r)notFound();const related=arabicReplies.filter(x=>x.categorySlug===r.categorySlug&&x.slug!==r.slug).slice(0,5);return <main className="section"><JsonLd data={{"@context":"https://schema.org","@type":"WebPage",name:r.title,description:r.description,url:`${site.url}/ar/reply/${r.slug}`,inLanguage:"ar"}}/><div className="container"><div className="breadcrumb"><Link href="/ar">الرئيسية</Link> / <Link href={`/ar/category/${r.categorySlug}`}>{r.category}</Link> / {r.title}</div><div className="contentpage"><span className="pill">{r.category}</span><h1>{r.title}</h1><p className="lead">{r.description}</p>{r.variants.map(v=><article className="replybox" key={v.label}><div className="replyhead"><h2>{v.label}</h2><ArabicCopyButton text={v.text}/></div><p style={{whiteSpace:"pre-line"}}>{v.text}</p></article>)}<h2>ردود ذات صلة</h2><div className="linkgrid">{related.map(x=><Link className="card" href={`/ar/reply/${x.slug}`} key={x.slug}><h3>{x.title}</h3><p>{x.description}</p></Link>)}</div></div></div></main>}

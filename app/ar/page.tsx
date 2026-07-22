@@ -1,35 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Briefcase, Headphones, Heart, MessageCircle, Sparkles, Users } from "lucide-react";
+import { Search, Sparkles, WandSparkles } from "lucide-react";
 import JsonLd from "@/components/JsonLd";
+import { arabicCategories, arabicGuides, arabicReplies } from "@/lib/arabicData";
 import { site } from "@/lib/site";
-
-export const metadata: Metadata = {
-  title: "الرد المناسب جاهز للنسخ",
-  description: "ردود عربية واضحة ومهنية للعمل وخدمة العملاء والمناسبات والمحادثات اليومية.",
-  alternates: { canonical: `${site.url}/ar`, languages: { en: site.url, ar: `${site.url}/ar`, "x-default": site.url } },
-};
-
-const categories = [
-  { title: "العمل والمقابلات", text: "ردود مهنية للمقابلات والعروض الوظيفية والتواصل في بيئة العمل.", icon: Briefcase },
-  { title: "خدمة العملاء", text: "ردود مهذبة للشكاوى والاسترجاع والتأخير وحل المشكلات.", icon: Headphones },
-  { title: "الشكر والاعتذار", text: "عبارات مناسبة للشكر والاعتذار والتقدير بوضوح واحترام.", icon: Heart },
-  { title: "الرسائل اليومية", text: "ردود سريعة للمحادثات الاجتماعية والمواقف المتكررة.", icon: MessageCircle },
-  { title: "العملاء والمبيعات", text: "رسائل احترافية للمتابعة والعروض وبناء علاقات أفضل.", icon: Users },
-];
-
-export default function ArabicHome(){
-  const schema = { "@context":"https://schema.org", "@type":"WebPage", name:"كوبي ريبلاي بالعربية", url:`${site.url}/ar`, inLanguage:"ar", isPartOf:{"@id":`${site.url}/#website`} };
-  return <>
-    <JsonLd data={schema}/>
-    <section className="hero arabic-hero"><div className="container">
-      <span className="eyebrow"><Sparkles size={15}/> النسخة العربية قيد التوسّع</span>
-      <h1>اعثر على <span className="gradient">الرد المناسب</span> خلال ثوانٍ.</h1>
-      <p className="lead">نبني مكتبة عربية عالية الجودة لردود العمل وخدمة العملاء والمناسبات والمحادثات اليومية، مع دعم كامل للكتابة من اليمين إلى اليسار.</p>
-      <div className="heroactions"><Link className="button" href="/">استكشف المكتبة الإنجليزية الآن</Link></div>
-      <div className="chips"><span className="chip">العربية الفصحى</span><span className="chip">واجهة RTL</span><span className="chip">SEO متعدد اللغات</span><span className="chip">بحث عربي قريباً</span></div>
-    </div></section>
-    <section className="section" id="arabic-categories"><div className="container"><div className="sectionhead"><div><h2>الأقسام العربية القادمة</h2><p>هذه البنية جاهزة لإضافة مكتبة الردود العربية في الإصدار التالي.</p></div></div><div className="grid">{categories.map(({title,text,icon:Icon})=><article className="card" key={title}><div className="iconbox"><Icon size={22}/></div><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>
-    <section className="section"><div className="container"><div className="guide-cta"><div><span className="pill">Sprint 8.1</span><h3>أساس متعدد اللغات جاهز للتوسع</h3><p>تم تجهيز مسارات اللغة، اتجاه RTL، بيانات hreflang، خرائط الموقع، وحفظ تفضيل اللغة تمهيداً لمكتبة عربية كاملة.</p></div><Link className="button" href="/ar/about">عن النسخة العربية</Link></div></div></section>
-  </>;
-}
+export const metadata: Metadata={title:"ردود عربية جاهزة للنسخ",description:"100 رد عربي جاهز للعمل وخدمة العملاء والشكر والاعتذار والمبيعات والمواقف اليومية.",alternates:{canonical:`${site.url}/ar`,languages:{en:site.url,ar:`${site.url}/ar`,"x-default":site.url}},openGraph:{locale:"ar_AE",title:"كوبي ريبلاي بالعربية",description:"ردود عربية جاهزة وواضحة لكل موقف."}};
+export default function ArabicHome(){return <><JsonLd data={{"@context":"https://schema.org","@type":"CollectionPage",name:"مكتبة كوبي ريبلاي العربية",url:`${site.url}/ar`,inLanguage:"ar",hasPart:arabicReplies.slice(0,20).map(r=>({"@type":"WebPage",name:r.title,url:`${site.url}/ar/reply/${r.slug}`}))}}/><section className="hero arabic-hero"><div className="container"><span className="eyebrow"><Sparkles size={15}/> مكتبة عربية كاملة</span><h1>الرد المناسب، <span className="gradient">جاهز للنسخ.</span></h1><p className="lead">100 رد عربي عملي ومهني للمقابلات والعملاء والشكر والاعتذار والاجتماعات والمواقف اليومية.</p><div className="heroactions"><Link className="button" href="/ar/search"><Search size={18}/> ابحث عن رد</Link><Link className="button secondary" href="/ar/studio"><WandSparkles size={18}/> خصّص ردك</Link></div><div className="chips"><span className="chip">100 رد عربي</span><span className="chip">10 أقسام</span><span className="chip">10 أدلة</span><span className="chip">واجهة RTL</span></div></div></section><section className="section" id="arabic-categories"><div className="container"><div className="sectionhead"><div><h2>تصفح الأقسام</h2><p>اختر نوع الموقف للوصول إلى الرد المناسب بسرعة.</p></div></div><div className="grid">{arabicCategories.map(c=><Link className="card" href={`/ar/category/${c.slug}`} key={c.slug}><h3>{c.name}</h3><p>{c.description}</p><strong>{arabicReplies.filter(r=>r.categorySlug===c.slug).length} ردود</strong></Link>)}</div></div></section><section className="section"><div className="container"><div className="sectionhead"><div><h2>أدلة التواصل</h2><p>نصائح عملية لكتابة رسائل أوضح وأكثر تأثيراً.</p></div><Link href="/ar/guides" className="textlink">عرض جميع الأدلة ←</Link></div><div className="linkgrid">{arabicGuides.slice(0,3).map(([title,slug,description])=><Link className="card" href={`/ar/guides/${slug}`} key={slug}><h3>{title}</h3><p>{description}</p></Link>)}</div></div></section></>}
