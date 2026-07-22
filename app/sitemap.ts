@@ -22,6 +22,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority,
   }));
 
+
+  const localizedRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${site.url}/ar`,
+      lastModified: releaseDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+      alternates: { languages: { en: site.url, ar: `${site.url}/ar`, "x-default": site.url } },
+    },
+    {
+      url: `${site.url}/ar/about`,
+      lastModified: releaseDate,
+      changeFrequency: "yearly",
+      priority: 0.45,
+      alternates: { languages: { en: `${site.url}/about`, ar: `${site.url}/ar/about`, "x-default": `${site.url}/about` } },
+    },
+  ];
+
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
     url: `${site.url}/category/${category.slug}`,
     lastModified: releaseDate,
@@ -43,5 +61,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...guideRoutes, ...replyRoutes];
+  return [...staticRoutes, ...localizedRoutes, ...categoryRoutes, ...guideRoutes, ...replyRoutes];
 }

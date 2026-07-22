@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
+import LocaleDocument from "@/components/LocaleDocument";
 import { absoluteUrl, site } from "@/lib/site";
 
 export const viewport: Viewport = {
@@ -21,7 +22,10 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    languages: { "en": "/", "ar": "/ar", "x-default": "/" },
+  },
   referrer: "origin-when-cross-origin",
   keywords: [
     "reply templates",
@@ -95,6 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <LocaleDocument />
         <JsonLd data={globalSchema} />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${site.gaId}`}
