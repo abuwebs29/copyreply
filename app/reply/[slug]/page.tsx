@@ -3,9 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReplyLibrary from "@/components/ReplyLibrary";
 import ReplyActions from "@/components/ReplyActions";
+import CommunicationJourney from "@/components/CommunicationJourney";
 import JsonLd from "@/components/JsonLd";
 import { site } from "@/lib/site";
 import { getReply, replies } from "@/lib/data";
+import { guides } from "@/lib/guides";
+import { getJourneyContext, getRelatedGuides, getRelatedReplies } from "@/lib/linking";
 
 export function generateStaticParams() {
   return replies.map((r) => ({ slug: r.slug }));
@@ -29,7 +32,9 @@ export default async function ReplyPage({ params }: { params: Promise<{ slug: st
   const r = getReply(slug);
   if (!r) notFound();
 
-  const related = replies.filter((x) => x.categorySlug === r.categorySlug && x.slug !== r.slug).slice(0, 6);
+  const related = getRelatedReplies(r, replies, 8);
+  const relatedGuides = getRelatedGuides(r, guides, 3);
+  const journeyContext = getJourneyContext(r.slug, replies);
   const faq = [
     { q: `How should I personalize a ${r.title.toLowerCase()}?`, a: "Replace every bracketed placeholder, add one specific detail from the conversation, and keep the final message consistent with your normal voice." },
     { q: "Which tone should I choose?", a: "Use a professional or formal tone for work and unfamiliar recipients. Friendly or warm tones are usually better for people you know and less formal situations." },
@@ -86,6 +91,8 @@ export default async function ReplyPage({ params }: { params: Promise<{ slug: st
       <main className="container replypage">
         <ReplyLibrary variants={r.variants} slug={r.slug} title={r.title} />
 
+        <CommunicationJourney context={journeyContext} />
+
         <section className="guidecard">
           <h2>How to use these replies</h2>
           <ol>
@@ -113,9 +120,18 @@ export default async function ReplyPage({ params }: { params: Promise<{ slug: st
           </div>
         </section>
 
+        {relatedGuides.length > 0 && (
+          <section>
+            <div className="sectionhead"><div><h2>Related communication guides</h2><p>Learn the principles behind this situation.</p></div></div>
+            <div className="replygrid">
+              {relatedGuides.map((guide) => <Link className="replycard" href={`/guides/${guide.slug}`} key={guide.slug}><span className="pill">Guide</span><h3>{guide.title}</h3><p>{guide.description}</p><span className="arrow">Read guide →</span></Link>)}
+            </div>
+          </section>
+        )}
+
         {related.length > 0 && (
           <section>
-            <div className="sectionhead"><div><h2>Related replies</h2><p>Continue with closely related situations.</p></div></div>
+            <div className="sectionhead"><div><h2>Smart related replies</h2><p>Recommended by category, situation, keywords, and communication intent.</p></div></div>
             <div className="replygrid">
               {related.map((x) => <Link className="replycard" href={`/reply/${x.slug}`} key={x.slug}><span className="pill">{x.category}</span><h3>{x.title}</h3><p>{x.description}</p><span className="arrow">View replies →</span></Link>)}
             </div>
