@@ -96,7 +96,7 @@ export default function GrowthDashboard() {
       <section className="admin-panel admin-opportunity">
         <h2>Next growth actions</h2>
         <p>Use zero-result and high-frequency searches in GA4 to prioritize new reply pages. Expand categories whose replies receive the most copies.</p>
-        <div className="admin-links"><Link href="/admin/content-factory">Open Content Factory</Link><Link className="button secondary" href="/admin/link-health">Link Health</Link><Link href="/search">Test search</Link><Link href="/studio">Test Studio</Link><Link href="/guides">Review guides</Link></div>
+        <div className="admin-links"><Link href="/admin/content-factory">Open Content Factory</Link><Link className="button secondary" href="/admin/search-intelligence">Search Intelligence</Link><Link className="button secondary" href="/admin/link-health">Link Health</Link><Link href="/search">Test search</Link><Link href="/studio">Test Studio</Link><Link href="/guides">Review guides</Link></div>
       </section>
     </div>
   );
