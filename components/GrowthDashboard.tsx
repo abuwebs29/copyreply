@@ -35,6 +35,10 @@ export default function GrowthDashboard() {
   const topSearches = useMemo(() => countBy(events.filter((event) => event.name === "search_submitted"), "query").slice(0, 8), [events]);
   const topReplies = useMemo(() => countBy(events.filter((event) => event.name === "reply_copied" || event.name === "studio_reply_copied"), "reply_title").slice(0, 8), [events]);
   const recent = events.slice(0, 12);
+  const arabicEvents = useMemo(() => events.filter((event) => event.params.locale === "ar"), [events]);
+  const arabicSearches = useMemo(() => countBy(arabicEvents.filter((event) => event.name === "search_submitted"), "query").slice(0, 8), [arabicEvents]);
+  const arabicReplies = useMemo(() => countBy(arabicEvents.filter((event) => event.name === "reply_copied" || event.name === "studio_reply_copied"), "reply_title").slice(0, 8), [arabicEvents]);
+  const zeroResultSearches = useMemo(() => countBy(arabicEvents.filter((event) => event.name === "search_submitted" && Number(event.params.results) === 0), "query").slice(0, 8), [arabicEvents]);
 
   function clearData() {
     clearAnalyticsEvents();
@@ -68,6 +72,15 @@ export default function GrowthDashboard() {
         <Panel title="Most copied replies" empty="Copied replies will appear here.">
           {topReplies.map(([label, value]) => <Row key={label} label={label} value={value} />)}
         </Panel>
+      </section>
+
+      <section className="admin-panel">
+        <div className="admin-panel-head"><h2>Arabic growth</h2><span className="pill">{arabicEvents.length} events</span></div>
+        <div className="admin-grid arabic-admin-grid">
+          <Panel title="Top Arabic searches" empty="Arabic searches will appear here.">{arabicSearches.map(([label, value]) => <Row key={label} label={label} value={value} />)}</Panel>
+          <Panel title="Most copied Arabic replies" empty="Arabic copy activity will appear here.">{arabicReplies.map(([label, value]) => <Row key={label} label={label} value={value} />)}</Panel>
+        </div>
+        <Panel title="Arabic zero-result opportunities" empty="No zero-result Arabic searches yet.">{zeroResultSearches.map(([label, value]) => <Row key={label} label={label} value={value} />)}</Panel>
       </section>
 
       <section className="admin-panel">

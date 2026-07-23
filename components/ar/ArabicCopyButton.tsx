@@ -1,3 +1,4 @@
 "use client";
 import { useState } from "react";
-export default function ArabicCopyButton({text}:{text:string}){const [done,setDone]=useState(false);return <button className="button secondary" onClick={async()=>{await navigator.clipboard.writeText(text);setDone(true);setTimeout(()=>setDone(false),1600)}}>{done?"تم النسخ":"نسخ الرد"}</button>}
+import { trackEvent } from "@/lib/clientAnalytics";
+export default function ArabicCopyButton({text,title="رد عربي"}:{text:string;title?:string}){const [done,setDone]=useState(false);return <button className="button secondary" onClick={async()=>{await navigator.clipboard.writeText(text);trackEvent("studio_reply_copied",{locale:"ar",reply_title:title});setDone(true);setTimeout(()=>setDone(false),1600)}}>{done?"تم النسخ":"نسخ الرد"}</button>}
